@@ -37,6 +37,7 @@ pub fn generate_self_enum() -> RustNode {
         .variant_struct("Use", vec![
             StructField::new("path", "Vec<String>"),
             StructField::new("alias", "Option<String>"),
+            StructField::new("public", "bool"),
         ])
         .variant_struct("Mod", vec![
             StructField::new("name", "String"),

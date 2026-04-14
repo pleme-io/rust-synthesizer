@@ -282,7 +282,7 @@ mod tests {
         let nodes = vec![
             RustNode::Comment("Auto-generated".into()),
             RustNode::Blank,
-            RustNode::Use { path: vec!["std".into(), "fmt".into()], alias: None },
+            RustNode::Use { path: vec!["std".into(), "fmt".into()], alias: None, public: false },
             RustNode::Blank,
             StructBuilder::new("Point")
                 .public()

@@ -119,6 +119,7 @@ pub fn generate_self_syn_enum() -> syn::ItemEnum {
             Use {
                 path: Vec<String>,
                 alias: Option<String>,
+                public: bool,
             },
             Mod {
                 name: String,
@@ -384,7 +385,7 @@ mod tests {
             ("Raw", RustNode::Raw("x + 1".into())),
             ("Ident", RustNode::Ident("foo".into())),
             ("Path", RustNode::Path(vec!["crate".into(), "node".into()])),
-            ("Use", RustNode::Use { path: vec!["std".into()], alias: None }),
+            ("Use", RustNode::Use { path: vec!["std".into()], alias: None, public: false }),
             ("Mod", RustNode::Mod { name: "test".into(), public: true }),
             ("Struct", RustNode::Struct { name: "S".into(), public: true, derives: vec![], fields: vec![] }),
             ("Enum", RustNode::Enum { name: "E".into(), public: true, derives: vec![], variants: vec![] }),

@@ -32,10 +32,11 @@ pub enum RustNode {
     Path(Vec<String>),
 
     // ── Declarations ────────────────────────────────────────────────
-    /// `use crate::types::RustType;`
+    /// `use crate::types::RustType;` or `pub use node::*;`
     Use {
         path: Vec<String>,
         alias: Option<String>,
+        public: bool,
     },
     /// `pub mod node;`
     Mod {
@@ -317,11 +318,12 @@ impl RustNode {
             Self::Path(segments) => format!("{pad}{}", segments.join("::")),
 
             // Declarations
-            Self::Use { path, alias } => {
+            Self::Use { path, alias, public } => {
+                let vis = if *public { "pub " } else { "" };
                 let p = path.join("::");
                 match alias {
-                    Some(a) => format!("{pad}use {p} as {a};"),
-                    None => format!("{pad}use {p};"),
+                    Some(a) => format!("{pad}{vis}use {p} as {a};"),
+                    None => format!("{pad}{vis}use {p};"),
                 }
             }
             Self::Mod { name, public } => {
@@ -628,7 +630,7 @@ mod tests {
     fn use_emits() {
         let node = RustNode::Use {
             path: vec!["crate".into(), "types".into(), "RustType".into()],
-            alias: None,
+            alias: None, public: false,
         };
         assert_eq!(node.emit(0), "use crate::types::RustType;");
     }

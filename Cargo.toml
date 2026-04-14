@@ -1,0 +1,21 @@
+[package]
+name = "rust-synthesizer"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.89.0"
+description = "Typed AST for structurally correct Rust source code generation"
+license = "MIT"
+repository = "https://github.com/pleme-io/rust-synthesizer"
+
+[dependencies]
+syn = { version = "2", features = ["full", "parsing", "printing", "visit", "extra-traits"] }
+quote = "1"
+proc-macro2 = "1"
+prettyplease = "0.2"
+tree-sitter = "0.24"
+tree-sitter-rust = "0.23"
+tree-sitter-json = "0.24"
+tree-sitter-yaml = "0.6"
+
+[dev-dependencies]
+proptest = "1"

@@ -184,6 +184,8 @@ impl RustNode {
     }
 
     #[must_use]
+    #[deprecated(note = "use a typed variant instead of raw()")]
+    #[allow(deprecated)]
     pub fn raw(s: &str) -> Self {
         Self::Raw(s.to_string())
     }

@@ -271,6 +271,7 @@ mod tests {
     // ── Validate rust-synthesizer's own output ──────────────────────
 
     #[test]
+    #[allow(deprecated)]
     fn rust_synthesizer_emit_produces_valid_rust() {
         use crate::node::*;
         use crate::emitter::emit_file;

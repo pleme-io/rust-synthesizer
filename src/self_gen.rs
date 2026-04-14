@@ -69,6 +69,14 @@ pub fn generate_self_enum() -> RustNode {
             StructField::new("body", "Vec<RustNode>"),
         ])
         // Expressions
+        .variant_struct("StructInit", vec![
+            StructField::new("name", "String"),
+            StructField::new("fields", "Vec<(String, RustNode)>"),
+        ])
+        .variant_struct("Closure", vec![
+            StructField::new("args", "Vec<String>"),
+            StructField::new("body", "Box<RustNode>"),
+        ])
         .variant_struct("Let", vec![
             StructField::new("name", "String"),
             StructField::new("mutable", "bool"),

@@ -150,6 +150,14 @@ pub fn generate_self_syn_enum() -> syn::ItemEnum {
                 return_type: Option<String>,
                 body: Vec<RustNode>,
             },
+            StructInit {
+                name: String,
+                fields: Vec<(String, RustNode)>,
+            },
+            Closure {
+                args: Vec<String>,
+                body: Box<RustNode>,
+            },
             Let {
                 name: String,
                 mutable: bool,
@@ -283,7 +291,7 @@ mod tests {
 
         assert_eq!(
             rust_node.variants.len(),
-            24,
+            26,
             "RustNode variant count changed — update generate_self_syn_enum()"
         );
     }
@@ -391,6 +399,8 @@ mod tests {
             ("Enum", RustNode::Enum { name: "E".into(), public: true, derives: vec![], variants: vec![] }),
             ("Impl", RustNode::Impl { target: "S".into(), trait_name: None, body: vec![] }),
             ("Fn", RustNode::Fn { name: "f".into(), public: true, must_use: false, args: vec![], return_type: None, body: vec![] }),
+            ("StructInit", RustNode::StructInit { name: "S".into(), fields: vec![("x".into(), RustNode::Int(1))] }),
+            ("Closure", RustNode::Closure { args: vec!["x".into()], body: Box::new(RustNode::ident("x")) }),
             ("Let", RustNode::Let { name: "x".into(), mutable: false, type_ann: None, value: Box::new(RustNode::Int(1)) }),
             ("Match", RustNode::Match { expr: Box::new(RustNode::ident("x")), arms: vec![] }),
             ("MethodCall", RustNode::MethodCall { receiver: Box::new(RustNode::ident("s")), method: "len".into(), args: vec![] }),
@@ -403,7 +413,7 @@ mod tests {
         ];
 
         // Verify we cover all 24 variants
-        assert_eq!(samples.len(), 24, "sample list must cover all variants");
+        assert_eq!(samples.len(), 26, "sample list must cover all variants");
 
         for (name, node) in &samples {
             let a = node.emit(0);

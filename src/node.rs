@@ -74,6 +74,16 @@ pub enum RustNode {
     },
 
     // ── Expressions ─────────────────────────────────────────────────
+    /// `StructName { field: value, ... }` — struct initialization
+    StructInit {
+        name: String,
+        fields: Vec<(String, RustNode)>,
+    },
+    /// `|arg| body` — closure expression
+    Closure {
+        args: Vec<String>,
+        body: Box<RustNode>,
+    },
     /// `let name: Type = value;`
     Let {
         name: String,
@@ -462,6 +472,30 @@ impl RustNode {
             }
 
             // Expressions
+            Self::StructInit { name, fields } => {
+                if fields.is_empty() {
+                    format!("{pad}{name} {{ }}")
+                } else {
+                    let fields_str = fields
+                        .iter()
+                        .map(|(k, v)| {
+                            let val = v.emit(0);
+                            if val == *k {
+                                k.clone() // shorthand: `name` instead of `name: name`
+                            } else {
+                                format!("{k}: {val}")
+                            }
+                        })
+                        .collect::<Vec<_>>()
+                        .join(", ");
+                    format!("{pad}{name} {{ {fields_str} }}")
+                }
+            }
+            Self::Closure { args, body } => {
+                let args_str = args.join(", ");
+                let b = body.emit(0);
+                format!("{pad}|{args_str}| {b}")
+            }
             Self::Let {
                 name,
                 mutable,

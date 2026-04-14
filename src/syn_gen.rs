@@ -39,9 +39,9 @@ pub fn find_struct(file: &syn::File, name: &str) -> Option<syn::ItemStruct> {
 /// Strip all `#[doc = "..."]` attributes from an enum and its variants.
 pub fn strip_doc_attrs(item: &syn::ItemEnum) -> syn::ItemEnum {
     let mut item = item.clone();
-    item.attrs.retain(|a| !a.path().is_ident("doc"));
+    item.attrs.retain(|a| !a.path().is_ident("doc") && !a.path().is_ident("deprecated") && !a.path().is_ident("allow"));
     for variant in &mut item.variants {
-        variant.attrs.retain(|a| !a.path().is_ident("doc"));
+        variant.attrs.retain(|a| !a.path().is_ident("doc") && !a.path().is_ident("deprecated") && !a.path().is_ident("allow"));
         // Also strip docs from variant fields
         match &mut variant.fields {
             syn::Fields::Named(fields) => {

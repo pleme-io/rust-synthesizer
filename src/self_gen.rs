@@ -224,6 +224,8 @@ mod tests {
                 let trimmed = line.trim();
                 !trimmed.starts_with("///")
                     && !trimmed.starts_with("//")
+                    && !trimmed.starts_with("#[deprecated")
+                    && !trimmed.starts_with("#[allow(deprecated")
                     && !trimmed.is_empty()
             })
             .collect::<Vec<_>>()

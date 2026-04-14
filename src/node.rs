@@ -22,7 +22,8 @@ pub enum RustNode {
     Int(i64),
     /// `true` / `false`
     Bool(bool),
-    /// Raw expression (escape hatch)
+    /// Raw expression — DEPRECATED: use a typed variant instead.
+    #[deprecated(note = "use a typed variant instead of Raw — Raw defeats provability")]
     Raw(String),
 
     // ── Identifiers ─────────────────────────────────────────────────
@@ -321,6 +322,7 @@ impl RustNode {
             }
             Self::Int(n) => format!("{pad}{n}"),
             Self::Bool(b) => format!("{pad}{b}"),
+            #[allow(deprecated)]
             Self::Raw(s) => format!("{pad}{s}"),
 
             // Identifiers

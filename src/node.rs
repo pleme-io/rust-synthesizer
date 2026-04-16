@@ -113,6 +113,11 @@ pub enum RustNode {
         name: String,
         args: Vec<RustNode>,
     },
+    /// `name! { body }` — proptest!, lazy_static!, etc. (block-style macros)
+    MacroBlock {
+        name: String,
+        body: String,
+    },
     /// `{ statements }`
     Block(Vec<RustNode>),
     /// `return expr`
@@ -129,6 +134,20 @@ pub enum RustNode {
     For {
         binding: String,
         iter: Box<RustNode>,
+        body: Vec<RustNode>,
+    },
+
+    // ── Attributes & modules ───────────────────────────────────────
+    /// `#[path]` or `#[path(args)]` — attribute annotation
+    /// Applies to the NEXT node in sequence.
+    Attr {
+        path: String,
+        args: Option<String>,
+    },
+    /// `mod name { body }` — inline module with body (not just declaration)
+    InlineMod {
+        name: String,
+        public: bool,
         body: Vec<RustNode>,
     },
 }
@@ -561,6 +580,9 @@ impl RustNode {
                     .join(", ");
                 format!("{pad}{name}!({a})")
             }
+            Self::MacroBlock { name, body } => {
+                format!("{pad}{name}! {{\n{body}\n{pad}}}")
+            }
             Self::Block(stmts) => {
                 let mut out = format!("{pad}{{\n");
                 for s in stmts {
@@ -611,6 +633,24 @@ impl RustNode {
                 let mut out = format!("{pad}for {binding} in {it} {{\n");
                 for s in body {
                     out.push_str(&s.emit(indent + 1));
+                    out.push('\n');
+                }
+                out.push_str(&format!("{pad}}}"));
+                out
+            }
+
+            Self::Attr { path, args } => {
+                match args {
+                    Some(a) => format!("{pad}#[{path}({a})]"),
+                    None => format!("{pad}#[{path}]"),
+                }
+            }
+
+            Self::InlineMod { name, public, body } => {
+                let vis = if *public { "pub " } else { "" };
+                let mut out = format!("{pad}{vis}mod {name} {{\n");
+                for node in body {
+                    out.push_str(&node.emit(indent + 1));
                     out.push('\n');
                 }
                 out.push_str(&format!("{pad}}}"));
@@ -910,5 +950,130 @@ mod tests {
         let out = node.emit(0);
         assert!(out.contains('{'));
         assert!(out.contains('}'));
+    }
+
+    // ── New variant tests (Attr, InlineMod, MacroBlock) ──────
+
+    #[test]
+    fn attr_without_args() {
+        let node = RustNode::Attr { path: "test".into(), args: None };
+        assert_eq!(node.emit(0), "#[test]");
+    }
+
+    #[test]
+    fn attr_with_args() {
+        let node = RustNode::Attr { path: "cfg".into(), args: Some("test".into()) };
+        assert_eq!(node.emit(0), "#[cfg(test)]");
+    }
+
+    #[test]
+    fn attr_indented() {
+        let node = RustNode::Attr { path: "test".into(), args: None };
+        assert_eq!(node.emit(1), "    #[test]");
+    }
+
+    #[test]
+    fn inline_mod_empty() {
+        let node = RustNode::InlineMod {
+            name: "tests".into(),
+            public: false,
+            body: vec![],
+        };
+        let out = node.emit(0);
+        assert!(out.contains("mod tests {"));
+        assert!(out.contains("}"));
+    }
+
+    #[test]
+    fn inline_mod_public() {
+        let node = RustNode::InlineMod {
+            name: "api".into(),
+            public: true,
+            body: vec![RustNode::Comment("inner".into())],
+        };
+        let out = node.emit(0);
+        assert!(out.contains("pub mod api {"));
+        assert!(out.contains("// inner"));
+    }
+
+    #[test]
+    fn inline_mod_balanced_braces() {
+        let node = RustNode::InlineMod {
+            name: "outer".into(),
+            public: false,
+            body: vec![RustNode::InlineMod {
+                name: "inner".into(),
+                public: false,
+                body: vec![],
+            }],
+        };
+        let out = node.emit(0);
+        let opens = out.chars().filter(|c| *c == '{').count();
+        let closes = out.chars().filter(|c| *c == '}').count();
+        assert_eq!(opens, closes, "braces must be balanced: {out}");
+    }
+
+    #[test]
+    fn macro_block_emits() {
+        let node = RustNode::MacroBlock {
+            name: "proptest".into(),
+            body: "    fn my_test() { }".into(),
+        };
+        let out = node.emit(0);
+        assert!(out.contains("proptest! {"), "must use brace syntax: {out}");
+        assert!(out.contains("fn my_test()"), "must contain body: {out}");
+        assert!(out.contains("}"), "must close: {out}");
+    }
+
+    #[test]
+    fn attr_then_fn_pattern() {
+        // Proves #[test] fn ... pattern works
+        let nodes = vec![
+            RustNode::Attr { path: "test".into(), args: None },
+            RustNode::Fn {
+                name: "it_works".into(),
+                public: false,
+                must_use: false,
+                args: vec![],
+                return_type: None,
+                body: vec![RustNode::MacroCall {
+                    name: "assert".into(),
+                    args: vec![RustNode::Bool(true)],
+                }],
+            },
+        ];
+        let out = crate::emit_file(&nodes);
+        assert!(out.contains("#[test]"));
+        assert!(out.contains("fn it_works()"));
+        assert!(out.contains("assert!(true)"));
+    }
+
+    #[test]
+    fn cfg_test_mod_pattern() {
+        // Proves #[cfg(test)] mod tests { ... } pattern works
+        let nodes = vec![
+            RustNode::Attr { path: "cfg".into(), args: Some("test".into()) },
+            RustNode::InlineMod {
+                name: "tests".into(),
+                public: false,
+                body: vec![
+                    RustNode::Use { path: vec!["super".into(), "*".into()], alias: None, public: false },
+                    RustNode::Blank,
+                    RustNode::Attr { path: "test".into(), args: None },
+                    RustNode::Fn {
+                        name: "it_works".into(),
+                        public: false,
+                        must_use: false,
+                        args: vec![],
+                        return_type: None,
+                        body: vec![],
+                    },
+                ],
+            },
+        ];
+        let out = crate::emit_file(&nodes);
+        // Must parse via syn
+        let result = syn::parse_file(&out);
+        assert!(result.is_ok(), "cfg(test) mod tests must parse: {:?}\n---\n{out}", result.err());
     }
 }

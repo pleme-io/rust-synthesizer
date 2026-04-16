@@ -181,6 +181,10 @@ pub fn generate_self_syn_enum() -> syn::ItemEnum {
                 name: String,
                 args: Vec<RustNode>,
             },
+            MacroBlock {
+                name: String,
+                body: String,
+            },
             Block(Vec<RustNode>),
             Return(Box<RustNode>),
             If {
@@ -191,6 +195,15 @@ pub fn generate_self_syn_enum() -> syn::ItemEnum {
             For {
                 binding: String,
                 iter: Box<RustNode>,
+                body: Vec<RustNode>,
+            },
+            Attr {
+                path: String,
+                args: Option<String>,
+            },
+            InlineMod {
+                name: String,
+                public: bool,
                 body: Vec<RustNode>,
             },
         }
@@ -291,7 +304,7 @@ mod tests {
 
         assert_eq!(
             rust_node.variants.len(),
-            26,
+            29,
             "RustNode variant count changed — update generate_self_syn_enum()"
         );
     }
@@ -406,14 +419,17 @@ mod tests {
             ("MethodCall", RustNode::MethodCall { receiver: Box::new(RustNode::ident("s")), method: "len".into(), args: vec![] }),
             ("FnCall", RustNode::FnCall { name: "f".into(), args: vec![] }),
             ("MacroCall", RustNode::MacroCall { name: "println".into(), args: vec![] }),
+            ("MacroBlock", RustNode::MacroBlock { name: "proptest".into(), body: "fn t() {}".into() }),
             ("Block", RustNode::Block(vec![])),
             ("Return", RustNode::Return(Box::new(RustNode::Int(0)))),
             ("If", RustNode::If { cond: Box::new(RustNode::Bool(true)), then_body: vec![], else_body: None }),
             ("For", RustNode::For { binding: "x".into(), iter: Box::new(RustNode::ident("items")), body: vec![] }),
+            ("Attr", RustNode::Attr { path: "test".into(), args: None }),
+            ("InlineMod", RustNode::InlineMod { name: "tests".into(), public: false, body: vec![] }),
         ];
 
-        // Verify we cover all 24 variants
-        assert_eq!(samples.len(), 26, "sample list must cover all variants");
+        // Verify we cover all 29 variants
+        assert_eq!(samples.len(), 29, "sample list must cover all variants");
 
         for (name, node) in &samples {
             let a = node.emit(0);

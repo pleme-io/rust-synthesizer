@@ -100,6 +100,10 @@ pub fn generate_self_enum() -> RustNode {
             StructField::new("name", "String"),
             StructField::new("args", "Vec<RustNode>"),
         ])
+        .variant_struct("MacroBlock", vec![
+            StructField::new("name", "String"),
+            StructField::new("body", "String"),
+        ])
         .tuple("Block", vec!["Vec<RustNode>"])
         .tuple("Return", vec!["Box<RustNode>"])
         // Control flow
@@ -111,6 +115,16 @@ pub fn generate_self_enum() -> RustNode {
         .variant_struct("For", vec![
             StructField::new("binding", "String"),
             StructField::new("iter", "Box<RustNode>"),
+            StructField::new("body", "Vec<RustNode>"),
+        ])
+        // Attributes & modules
+        .variant_struct("Attr", vec![
+            StructField::new("path", "String"),
+            StructField::new("args", "Option<String>"),
+        ])
+        .variant_struct("InlineMod", vec![
+            StructField::new("name", "String"),
+            StructField::new("public", "bool"),
             StructField::new("body", "Vec<RustNode>"),
         ])
         .build()

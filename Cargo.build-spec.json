@@ -27,6 +27,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "aho_corasick",
+        "path": "src/lib.rs"
+      },
       "dependencies": [
         {
           "name": "memchr",
@@ -66,6 +70,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "autocfg",
+        "path": "src/lib.rs"
+      },
       "dependencies": [],
       "runtime_dependencies": [],
       "build_dependencies": [],
@@ -88,6 +96,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "bit_set",
+        "path": "src/lib.rs"
+      },
       "dependencies": [
         {
           "name": "bit_vec",
@@ -137,6 +149,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "bit_vec",
+        "path": "src/lib.rs"
+      },
       "dependencies": [],
       "runtime_dependencies": [],
       "build_dependencies": [],
@@ -158,6 +174,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "bitflags",
+        "path": "src/lib.rs"
+      },
       "dependencies": [],
       "runtime_dependencies": [],
       "build_dependencies": [],
@@ -177,6 +197,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "cc",
+        "path": "src/lib.rs"
+      },
       "dependencies": [
         {
           "name": "find_msvc_tools",
@@ -241,6 +265,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "cfg_if",
+        "path": "src/lib.rs"
+      },
       "dependencies": [],
       "runtime_dependencies": [],
       "build_dependencies": [],
@@ -262,6 +290,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "errno",
+        "path": "src/lib.rs"
+      },
       "dependencies": [
         {
           "name": "libc",
@@ -305,6 +337,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "fastrand",
+        "path": "src/lib.rs"
+      },
       "dependencies": [],
       "runtime_dependencies": [],
       "build_dependencies": [],
@@ -324,6 +360,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "find_msvc_tools",
+        "path": "src/lib.rs"
+      },
       "dependencies": [],
       "runtime_dependencies": [],
       "build_dependencies": [],
@@ -346,6 +386,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "fnv",
+        "path": "lib.rs"
+      },
       "dependencies": [],
       "runtime_dependencies": [],
       "build_dependencies": [],
@@ -367,6 +411,10 @@
       "proc_macro": false,
       "build_script": "build.rs",
       "binaries": [],
+      "lib_target": {
+        "name": "getrandom",
+        "path": "src/lib.rs"
+      },
       "dependencies": [
         {
           "name": "cfg_if",
@@ -431,6 +479,10 @@
       "proc_macro": false,
       "build_script": "build.rs",
       "binaries": [],
+      "lib_target": {
+        "name": "getrandom",
+        "path": "src/lib.rs"
+      },
       "dependencies": [
         {
           "name": "cfg_if",
@@ -498,6 +550,10 @@
       "proc_macro": false,
       "build_script": "build.rs",
       "binaries": [],
+      "lib_target": {
+        "name": "libc",
+        "path": "src/lib.rs"
+      },
       "dependencies": [],
       "runtime_dependencies": [],
       "build_dependencies": [],
@@ -520,6 +576,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "memchr",
+        "path": "src/lib.rs"
+      },
       "dependencies": [],
       "runtime_dependencies": [],
       "build_dependencies": [],
@@ -541,6 +601,10 @@
       "proc_macro": false,
       "build_script": "build.rs",
       "binaries": [],
+      "lib_target": {
+        "name": "num_traits",
+        "path": "src/lib.rs"
+      },
       "dependencies": [
         {
           "name": "autocfg",
@@ -584,6 +648,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "once_cell",
+        "path": "src/lib.rs"
+      },
       "dependencies": [],
       "runtime_dependencies": [],
       "build_dependencies": [],
@@ -606,6 +674,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "ppv_lite86",
+        "path": "src/lib.rs"
+      },
       "dependencies": [
         {
           "name": "zerocopy",
@@ -649,6 +721,10 @@
       "proc_macro": false,
       "build_script": "build.rs",
       "binaries": [],
+      "lib_target": {
+        "name": "prettyplease",
+        "path": "src/lib.rs"
+      },
       "dependencies": [
         {
           "name": "proc_macro2",
@@ -720,6 +796,10 @@
       "proc_macro": false,
       "build_script": "build.rs",
       "binaries": [],
+      "lib_target": {
+        "name": "proc_macro2",
+        "path": "src/lib.rs"
+      },
       "dependencies": [
         {
           "name": "unicode_ident",
@@ -775,6 +855,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "proptest",
+        "path": "src/lib.rs"
+      },
       "dependencies": [
         {
           "name": "bit_set",
@@ -1029,6 +1113,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "quick_error",
+        "path": "src/lib.rs"
+      },
       "dependencies": [],
       "runtime_dependencies": [],
       "build_dependencies": [],
@@ -1051,6 +1139,10 @@
       "proc_macro": false,
       "build_script": "build.rs",
       "binaries": [],
+      "lib_target": {
+        "name": "quote",
+        "path": "src/lib.rs"
+      },
       "dependencies": [
         {
           "name": "proc_macro2",
@@ -1101,6 +1193,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "rand",
+        "path": "src/lib.rs"
+      },
       "dependencies": [
         {
           "name": "rand_chacha",
@@ -1160,6 +1256,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "rand_chacha",
+        "path": "src/lib.rs"
+      },
       "dependencies": [
         {
           "name": "ppv_lite86",
@@ -1227,6 +1327,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "rand_core",
+        "path": "src/lib.rs"
+      },
       "dependencies": [
         {
           "name": "getrandom",
@@ -1266,6 +1370,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "rand_xorshift",
+        "path": "src/lib.rs"
+      },
       "dependencies": [
         {
           "name": "rand_core",
@@ -1322,6 +1430,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "regex",
+        "path": "src/lib.rs"
+      },
       "dependencies": [
         {
           "name": "aho_corasick",
@@ -1457,6 +1569,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "regex_automata",
+        "path": "src/lib.rs"
+      },
       "dependencies": [
         {
           "name": "aho_corasick",
@@ -1556,6 +1672,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "regex_syntax",
+        "path": "src/lib.rs"
+      },
       "dependencies": [],
       "runtime_dependencies": [],
       "build_dependencies": [],
@@ -1573,6 +1693,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "rust_synthesizer",
+        "path": "src/lib.rs"
+      },
       "dependencies": [
         {
           "name": "prettyplease",
@@ -1810,6 +1934,10 @@
       "proc_macro": false,
       "build_script": "build.rs",
       "binaries": [],
+      "lib_target": {
+        "name": "rustix",
+        "path": "src/lib.rs"
+      },
       "dependencies": [
         {
           "name": "bitflags",
@@ -1895,6 +2023,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "rusty_fork",
+        "path": "src/lib.rs"
+      },
       "dependencies": [
         {
           "name": "fnv",
@@ -2004,6 +2136,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "shlex",
+        "path": "src/lib.rs"
+      },
       "dependencies": [],
       "runtime_dependencies": [],
       "build_dependencies": [],
@@ -2023,6 +2159,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "streaming_iterator",
+        "path": "src/lib.rs"
+      },
       "dependencies": [],
       "runtime_dependencies": [],
       "build_dependencies": [],
@@ -2052,6 +2192,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "syn",
+        "path": "src/lib.rs"
+      },
       "dependencies": [
         {
           "name": "proc_macro2",
@@ -2140,6 +2284,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "synthesizer_core",
+        "path": "src/lib.rs"
+      },
       "dependencies": [],
       "runtime_dependencies": [],
       "build_dependencies": [],
@@ -2162,6 +2310,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "tempfile",
+        "path": "src/lib.rs"
+      },
       "dependencies": [
         {
           "name": "fastrand",
@@ -2266,6 +2418,10 @@
       "proc_macro": false,
       "build_script": "binding_rust/build.rs",
       "binaries": [],
+      "lib_target": {
+        "name": "tree_sitter",
+        "path": "binding_rust/lib.rs"
+      },
       "dependencies": [
         {
           "name": "cc",
@@ -2401,6 +2557,10 @@
       "proc_macro": false,
       "build_script": "bindings/rust/build.rs",
       "binaries": [],
+      "lib_target": {
+        "name": "tree_sitter_json",
+        "path": "bindings/rust/lib.rs"
+      },
       "dependencies": [
         {
           "name": "cc",
@@ -2466,6 +2626,10 @@
       "proc_macro": false,
       "build_script": "build.rs",
       "binaries": [],
+      "lib_target": {
+        "name": "tree_sitter_language",
+        "path": "src/language.rs"
+      },
       "dependencies": [],
       "runtime_dependencies": [],
       "build_dependencies": [],
@@ -2485,6 +2649,10 @@
       "proc_macro": false,
       "build_script": "bindings/rust/build.rs",
       "binaries": [],
+      "lib_target": {
+        "name": "tree_sitter_rust",
+        "path": "bindings/rust/lib.rs"
+      },
       "dependencies": [
         {
           "name": "cc",
@@ -2550,6 +2718,10 @@
       "proc_macro": false,
       "build_script": "bindings/rust/build.rs",
       "binaries": [],
+      "lib_target": {
+        "name": "tree_sitter_yaml",
+        "path": "bindings/rust/lib.rs"
+      },
       "dependencies": [
         {
           "name": "cc",
@@ -2615,6 +2787,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "unarray",
+        "path": "src/lib.rs"
+      },
       "dependencies": [],
       "runtime_dependencies": [],
       "build_dependencies": [],
@@ -2634,6 +2810,10 @@
       "proc_macro": false,
       "build_script": null,
       "binaries": [],
+      "lib_target": {
+        "name": "unicode_ident",
+        "path": "src/lib.rs"
+      },
       "dependencies": [],
       "runtime_dependencies": [],
       "build_dependencies": [],
@@ -2666,6 +2846,10 @@
           "path": "src/bin/sleep.rs"
         }
       ],
+      "lib_target": {
+        "name": "wait_timeout",
+        "path": "src/lib.rs"
+      },
       "dependencies": [
         {
           "name": "libc",
@@ -2707,6 +2891,10 @@
       "proc_macro": false,
       "build_script": "build.rs",
       "binaries": [],
+      "lib_target": {
+        "name": "zerocopy",
+        "path": "src/lib.rs"
+      },
       "dependencies": [],
       "runtime_dependencies": [],
       "build_dependencies": [],

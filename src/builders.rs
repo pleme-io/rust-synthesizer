@@ -308,9 +308,7 @@ mod tests {
 
     #[test]
     fn impl_trait_builder() {
-        let node = ImplBuilder::new("Point")
-            .for_trait("Display")
-            .build();
+        let node = ImplBuilder::new("Point").for_trait("Display").build();
         let out = node.emit(0);
         assert!(out.contains("impl Display for Point {"));
     }

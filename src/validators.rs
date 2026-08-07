@@ -93,12 +93,14 @@ impl TreeSitterValidator {
 impl CodeValidator for TreeSitterValidator {
     fn validate(&self, source: &str) -> Result<(), ValidationError> {
         let mut parser = tree_sitter::Parser::new();
-        parser.set_language(&self.language).map_err(|e| ValidationError {
-            language: self.name.clone(),
-            message: format!("failed to set language: {e}"),
-            line: None,
-            column: None,
-        })?;
+        parser
+            .set_language(&self.language)
+            .map_err(|e| ValidationError {
+                language: self.name.clone(),
+                message: format!("failed to set language: {e}"),
+                line: None,
+                column: None,
+            })?;
 
         let tree = parser.parse(source, None).ok_or_else(|| ValidationError {
             language: self.name.clone(),
@@ -195,7 +197,10 @@ mod tests {
     #[test]
     fn rust_validator_accepts_struct() {
         let v = RustValidator;
-        assert!(v.validate("#[derive(Debug)]\npub struct Foo { pub x: i32 }").is_ok());
+        assert!(
+            v.validate("#[derive(Debug)]\npub struct Foo { pub x: i32 }")
+                .is_ok()
+        );
     }
 
     #[test]
@@ -249,7 +254,10 @@ mod tests {
     #[test]
     fn yaml_accepts_valid() {
         let v = TreeSitterValidator::yaml();
-        assert!(v.validate("key: value\nlist:\n  - item1\n  - item2\n").is_ok());
+        assert!(
+            v.validate("key: value\nlist:\n  - item1\n  - item2\n")
+                .is_ok()
+        );
     }
 
     #[test]
@@ -273,9 +281,9 @@ mod tests {
     #[test]
     #[allow(deprecated)]
     fn rust_synthesizer_emit_produces_valid_rust() {
-        use crate::node::*;
-        use crate::emitter::emit_file;
         use crate::builders::*;
+        use crate::emitter::emit_file;
+        use crate::node::*;
 
         let v = RustValidator;
 
@@ -283,7 +291,11 @@ mod tests {
         let nodes = vec![
             RustNode::Comment("Auto-generated".into()),
             RustNode::Blank,
-            RustNode::Use { path: vec!["std".into(), "fmt".into()], alias: None, public: false },
+            RustNode::Use {
+                path: vec!["std".into(), "fmt".into()],
+                alias: None,
+                public: false,
+            },
             RustNode::Blank,
             StructBuilder::new("Point")
                 .public()
@@ -298,9 +310,7 @@ mod tests {
                 .derive("Debug")
                 .unit("Circle")
                 .tuple("Rect", vec!["f64", "f64"])
-                .variant_struct("Polygon", vec![
-                    StructField::new("sides", "Vec<f64>"),
-                ])
+                .variant_struct("Polygon", vec![StructField::new("sides", "Vec<f64>")])
                 .build(),
             RustNode::Blank,
             ImplBuilder::new("Point")
@@ -360,6 +370,9 @@ mod tests {
              struct MatchArm {{ pattern: String, body: RustNode }}\n\
              {output}"
         );
-        assert!(v.validate(&full).is_ok(), "self-generated enum must be valid Rust");
+        assert!(
+            v.validate(&full).is_ok(),
+            "self-generated enum must be valid Rust"
+        );
     }
 }

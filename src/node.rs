@@ -40,10 +40,7 @@ pub enum RustNode {
         public: bool,
     },
     /// `pub mod node;`
-    Mod {
-        name: String,
-        public: bool,
-    },
+    Mod { name: String, public: bool },
     /// Struct definition
     Struct {
         name: String,
@@ -104,20 +101,11 @@ pub enum RustNode {
         args: Vec<RustNode>,
     },
     /// `name(args)`
-    FnCall {
-        name: String,
-        args: Vec<RustNode>,
-    },
+    FnCall { name: String, args: Vec<RustNode> },
     /// `name!(args)` — format!, vec!, assert!, etc.
-    MacroCall {
-        name: String,
-        args: Vec<RustNode>,
-    },
+    MacroCall { name: String, args: Vec<RustNode> },
     /// `name! { body }` — proptest!, lazy_static!, etc. (block-style macros)
-    MacroBlock {
-        name: String,
-        body: String,
-    },
+    MacroBlock { name: String, body: String },
     /// `{ statements }`
     Block(Vec<RustNode>),
     /// `return expr`
@@ -140,10 +128,7 @@ pub enum RustNode {
     // ── Attributes & modules ───────────────────────────────────────
     /// `#[path]` or `#[path(args)]` — attribute annotation
     /// Applies to the NEXT node in sequence.
-    Attr {
-        path: String,
-        args: Option<String>,
-    },
+    Attr { path: String, args: Option<String> },
     /// `mod name { body }` — inline module with body (not just declaration)
     InlineMod {
         name: String,
@@ -307,7 +292,10 @@ impl EnumVariant {
 
     #[must_use]
     pub fn tuple(name: &str, types: Vec<&str>) -> Self {
-        Self::Tuple(name.to_string(), types.into_iter().map(|s| s.to_string()).collect())
+        Self::Tuple(
+            name.to_string(),
+            types.into_iter().map(|s| s.to_string()).collect(),
+        )
     }
 
     #[must_use]
@@ -351,7 +339,11 @@ impl RustNode {
             Self::Path(segments) => format!("{pad}{}", segments.join("::")),
 
             // Declarations
-            Self::Use { path, alias, public } => {
+            Self::Use {
+                path,
+                alias,
+                public,
+            } => {
                 let vis = if *public { "pub " } else { "" };
                 let p = path.join("::");
                 match alias {
@@ -371,10 +363,7 @@ impl RustNode {
             } => {
                 let mut out = String::new();
                 if !derives.is_empty() {
-                    out.push_str(&format!(
-                        "{pad}#[derive({})]\n",
-                        derives.join(", ")
-                    ));
+                    out.push_str(&format!("{pad}#[derive({})]\n", derives.join(", ")));
                 }
                 let vis = if *public { "pub " } else { "" };
                 if fields.is_empty() {
@@ -387,10 +376,7 @@ impl RustNode {
                         out.push_str(&format!("{pad}    /// {doc}\n"));
                     }
                     let fvis = if f.public { "pub " } else { "" };
-                    out.push_str(&format!(
-                        "{pad}    {fvis}{}: {},\n",
-                        f.name, f.field_type
-                    ));
+                    out.push_str(&format!("{pad}    {fvis}{}: {},\n", f.name, f.field_type));
                 }
                 out.push_str(&format!("{pad}}}"));
                 out
@@ -403,10 +389,7 @@ impl RustNode {
             } => {
                 let mut out = String::new();
                 if !derives.is_empty() {
-                    out.push_str(&format!(
-                        "{pad}#[derive({})]\n",
-                        derives.join(", ")
-                    ));
+                    out.push_str(&format!("{pad}#[derive({})]\n", derives.join(", ")));
                 }
                 let vis = if *public { "pub " } else { "" };
                 out.push_str(&format!("{pad}{vis}enum {name} {{\n"));
@@ -416,10 +399,7 @@ impl RustNode {
                             out.push_str(&format!("{pad}    {vname},\n"));
                         }
                         EnumVariant::Tuple(vname, types) => {
-                            out.push_str(&format!(
-                                "{pad}    {vname}({}),\n",
-                                types.join(", ")
-                            ));
+                            out.push_str(&format!("{pad}    {vname}({}),\n", types.join(", ")));
                         }
                         EnumVariant::Struct(vname, fields) => {
                             out.push_str(&format!("{pad}    {vname} {{\n"));
@@ -639,12 +619,10 @@ impl RustNode {
                 out
             }
 
-            Self::Attr { path, args } => {
-                match args {
-                    Some(a) => format!("{pad}#[{path}({a})]"),
-                    None => format!("{pad}#[{path}]"),
-                }
-            }
+            Self::Attr { path, args } => match args {
+                Some(a) => format!("{pad}#[{path}({a})]"),
+                None => format!("{pad}#[{path}]"),
+            },
 
             Self::InlineMod { name, public, body } => {
                 let vis = if *public { "pub " } else { "" };
@@ -708,14 +686,18 @@ mod tests {
     fn use_emits() {
         let node = RustNode::Use {
             path: vec!["crate".into(), "types".into(), "RustType".into()],
-            alias: None, public: false,
+            alias: None,
+            public: false,
         };
         assert_eq!(node.emit(0), "use crate::types::RustType;");
     }
 
     #[test]
     fn mod_public() {
-        let node = RustNode::Mod { name: "node".into(), public: true };
+        let node = RustNode::Mod {
+            name: "node".into(),
+            public: true,
+        };
         assert_eq!(node.emit(0), "pub mod node;");
     }
 
@@ -738,10 +720,7 @@ mod tests {
             name: "Point".into(),
             public: true,
             derives: vec!["Debug".into(), "Clone".into()],
-            fields: vec![
-                StructField::new("x", "f64"),
-                StructField::new("y", "f64"),
-            ],
+            fields: vec![StructField::new("x", "f64"), StructField::new("y", "f64")],
         };
         let out = node.emit(0);
         assert!(out.contains("#[derive(Debug, Clone)]"));
@@ -778,10 +757,13 @@ mod tests {
             variants: vec![
                 EnumVariant::unit("Blank"),
                 EnumVariant::tuple("Comment", vec!["String"]),
-                EnumVariant::with_fields("Struct", vec![
-                    StructField::new("name", "String"),
-                    StructField::new("fields", "Vec<Field>"),
-                ]),
+                EnumVariant::with_fields(
+                    "Struct",
+                    vec![
+                        StructField::new("name", "String"),
+                        StructField::new("fields", "Vec<Field>"),
+                    ],
+                ),
             ],
         };
         let out = node.emit(0);
@@ -875,7 +857,11 @@ mod tests {
 
     #[test]
     fn method_call_emits() {
-        let node = RustNode::method_call(RustNode::ident("s"), "push_str", vec![RustNode::str("hello")]);
+        let node = RustNode::method_call(
+            RustNode::ident("s"),
+            "push_str",
+            vec![RustNode::str("hello")],
+        );
         assert_eq!(node.emit(0), "s.push_str(\"hello\")");
     }
 
@@ -956,19 +942,28 @@ mod tests {
 
     #[test]
     fn attr_without_args() {
-        let node = RustNode::Attr { path: "test".into(), args: None };
+        let node = RustNode::Attr {
+            path: "test".into(),
+            args: None,
+        };
         assert_eq!(node.emit(0), "#[test]");
     }
 
     #[test]
     fn attr_with_args() {
-        let node = RustNode::Attr { path: "cfg".into(), args: Some("test".into()) };
+        let node = RustNode::Attr {
+            path: "cfg".into(),
+            args: Some("test".into()),
+        };
         assert_eq!(node.emit(0), "#[cfg(test)]");
     }
 
     #[test]
     fn attr_indented() {
-        let node = RustNode::Attr { path: "test".into(), args: None };
+        let node = RustNode::Attr {
+            path: "test".into(),
+            args: None,
+        };
         assert_eq!(node.emit(1), "    #[test]");
     }
 
@@ -1029,7 +1024,10 @@ mod tests {
     fn attr_then_fn_pattern() {
         // Proves #[test] fn ... pattern works
         let nodes = vec![
-            RustNode::Attr { path: "test".into(), args: None },
+            RustNode::Attr {
+                path: "test".into(),
+                args: None,
+            },
             RustNode::Fn {
                 name: "it_works".into(),
                 public: false,
@@ -1052,14 +1050,24 @@ mod tests {
     fn cfg_test_mod_pattern() {
         // Proves #[cfg(test)] mod tests { ... } pattern works
         let nodes = vec![
-            RustNode::Attr { path: "cfg".into(), args: Some("test".into()) },
+            RustNode::Attr {
+                path: "cfg".into(),
+                args: Some("test".into()),
+            },
             RustNode::InlineMod {
                 name: "tests".into(),
                 public: false,
                 body: vec![
-                    RustNode::Use { path: vec!["super".into(), "*".into()], alias: None, public: false },
+                    RustNode::Use {
+                        path: vec!["super".into(), "*".into()],
+                        alias: None,
+                        public: false,
+                    },
                     RustNode::Blank,
-                    RustNode::Attr { path: "test".into(), args: None },
+                    RustNode::Attr {
+                        path: "test".into(),
+                        args: None,
+                    },
                     RustNode::Fn {
                         name: "it_works".into(),
                         public: false,
@@ -1074,6 +1082,10 @@ mod tests {
         let out = crate::emit_file(&nodes);
         // Must parse via syn
         let result = syn::parse_file(&out);
-        assert!(result.is_ok(), "cfg(test) mod tests must parse: {:?}\n---\n{out}", result.err());
+        assert!(
+            result.is_ok(),
+            "cfg(test) mod tests must parse: {:?}\n---\n{out}",
+            result.err()
+        );
     }
 }

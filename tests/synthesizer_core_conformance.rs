@@ -87,10 +87,7 @@ fn law_determinism_holds_on_struct_node() {
         name: "Point".into(),
         public: true,
         derives: vec!["Debug".into(), "Clone".into()],
-        fields: vec![
-            StructField::new("x", "f64"),
-            StructField::new("y", "f64"),
-        ],
+        fields: vec![StructField::new("x", "f64"), StructField::new("y", "f64")],
     };
     assert!(laws::is_deterministic(&n, 2));
 }

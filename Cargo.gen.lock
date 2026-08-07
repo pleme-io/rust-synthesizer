@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
-  "cargo_lock_sha256": "ac2486e3471d9f3368a960b545e7148f77b9d7f5e6bbcab3e3f3f51ed6cec7e9",
+  "cargo_lock_sha256": "83df34b54a5375a8346d50bb23870b57bbf7c64d02f85245a2ba5687df69eed6",
   "manifest_sha256": {
-    "Cargo.toml": "2b97390989ac8582f6ab9cd5dd2dce7f554c2006cc82744153c4bfa8195f6d98"
+    "Cargo.toml": "6541a86a5612fee758c28ef0b2a98790bea0468d9297f671c6081c44d7595c47"
   },
   "target_resolves": {
     "base": {
@@ -839,7 +839,7 @@
           "unicode-segment"
         ]
       },
-      "rust-synthesizer-0.1.0": {
+      "rust-synthesizer-0.1.1": {
         "runtime_dependencies": [
           {
             "name": "prettyplease",
@@ -2020,7 +2020,7 @@
     "regex-syntax-0.8.11": {
       "edition": "2021"
     },
-    "rust-synthesizer-0.1.0": {
+    "rust-synthesizer-0.1.1": {
       "edition": "2024",
       "lib_target": {
         "name": "rust_synthesizer",

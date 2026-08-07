@@ -39,9 +39,15 @@ pub fn find_struct(file: &syn::File, name: &str) -> Option<syn::ItemStruct> {
 /// Strip all `#[doc = "..."]` attributes from an enum and its variants.
 pub fn strip_doc_attrs(item: &syn::ItemEnum) -> syn::ItemEnum {
     let mut item = item.clone();
-    item.attrs.retain(|a| !a.path().is_ident("doc") && !a.path().is_ident("deprecated") && !a.path().is_ident("allow"));
+    item.attrs.retain(|a| {
+        !a.path().is_ident("doc") && !a.path().is_ident("deprecated") && !a.path().is_ident("allow")
+    });
     for variant in &mut item.variants {
-        variant.attrs.retain(|a| !a.path().is_ident("doc") && !a.path().is_ident("deprecated") && !a.path().is_ident("allow"));
+        variant.attrs.retain(|a| {
+            !a.path().is_ident("doc")
+                && !a.path().is_ident("deprecated")
+                && !a.path().is_ident("allow")
+        });
         // Also strip docs from variant fields
         match &mut variant.fields {
             syn::Fields::Named(fields) => {
@@ -53,6 +59,43 @@ pub fn strip_doc_attrs(item: &syn::ItemEnum) -> syn::ItemEnum {
                 for field in &mut fields.unnamed {
                     field.attrs.retain(|a| !a.path().is_ident("doc"));
                 }
+            }
+            syn::Fields::Unit => {}
+        }
+    }
+    item
+}
+
+/// Drop TRAILING punctuation from every `Punctuated` in an enum — the
+/// variant list and each variant's field list.
+///
+/// syn records a trailing comma in `Punctuated`, so two enums that differ
+/// only by `Foo { a: A, b: B, }` vs `Foo { a: A, b: B }` are unequal as
+/// AST values. That comma carries no structure whatsoever in Rust: it is
+/// a layout artifact, and specifically one rustfmt DECIDES. rustfmt drops
+/// it whenever it collapses a struct-style variant onto one line, which
+/// depends only on how wide the variant happens to be.
+///
+/// This repo is self-hosting — `src/node.rs` is read back through
+/// `include_str!` and compared against what the generator emits — so a
+/// formatting pass over the canonical source moves one side of that
+/// comparison and not the other. Normalizing here is what keeps the
+/// fixed-point proof a proof ABOUT STRUCTURE rather than a proof about
+/// rustfmt's current line-width heuristic.
+///
+/// Collecting a `Punctuated` from an iterator of its items is what drops
+/// the trailing punctuation; the separators between items are rebuilt.
+#[must_use]
+pub fn normalize_trailing_punct(item: &syn::ItemEnum) -> syn::ItemEnum {
+    let mut item = item.clone();
+    item.variants = item.variants.iter().cloned().collect();
+    for variant in &mut item.variants {
+        match &mut variant.fields {
+            syn::Fields::Named(fields) => {
+                fields.named = fields.named.iter().cloned().collect();
+            }
+            syn::Fields::Unnamed(fields) => {
+                fields.unnamed = fields.unnamed.iter().cloned().collect();
             }
             syn::Fields::Unit => {}
         }
@@ -231,9 +274,12 @@ mod tests {
 
         let generated_enum = generate_self_syn_enum();
 
-        // Strip doc comments for structural comparison
-        let canonical_stripped = strip_doc_attrs(&canonical_enum);
-        let generated_stripped = strip_doc_attrs(&generated_enum);
+        // Strip doc comments AND trailing punctuation for structural
+        // comparison. Both are documentation-or-layout, not structure; see
+        // `normalize_trailing_punct` for why the comma in particular is
+        // rustfmt's decision and not ours.
+        let canonical_stripped = normalize_trailing_punct(&strip_doc_attrs(&canonical_enum));
+        let generated_stripped = normalize_trailing_punct(&strip_doc_attrs(&generated_enum));
 
         assert_eq!(
             canonical_stripped, generated_stripped,
@@ -386,7 +432,11 @@ mod tests {
         ];
         for (i, source) in files.iter().enumerate() {
             let result = syn::parse_file(source);
-            assert!(result.is_ok(), "source file {i} failed to parse: {:?}", result.err());
+            assert!(
+                result.is_ok(),
+                "source file {i} failed to parse: {:?}",
+                result.err()
+            );
         }
     }
 
@@ -406,26 +456,150 @@ mod tests {
             ("Raw", RustNode::Raw("x + 1".into())),
             ("Ident", RustNode::Ident("foo".into())),
             ("Path", RustNode::Path(vec!["crate".into(), "node".into()])),
-            ("Use", RustNode::Use { path: vec!["std".into()], alias: None, public: false }),
-            ("Mod", RustNode::Mod { name: "test".into(), public: true }),
-            ("Struct", RustNode::Struct { name: "S".into(), public: true, derives: vec![], fields: vec![] }),
-            ("Enum", RustNode::Enum { name: "E".into(), public: true, derives: vec![], variants: vec![] }),
-            ("Impl", RustNode::Impl { target: "S".into(), trait_name: None, body: vec![] }),
-            ("Fn", RustNode::Fn { name: "f".into(), public: true, must_use: false, args: vec![], return_type: None, body: vec![] }),
-            ("StructInit", RustNode::StructInit { name: "S".into(), fields: vec![("x".into(), RustNode::Int(1))] }),
-            ("Closure", RustNode::Closure { args: vec!["x".into()], body: Box::new(RustNode::ident("x")) }),
-            ("Let", RustNode::Let { name: "x".into(), mutable: false, type_ann: None, value: Box::new(RustNode::Int(1)) }),
-            ("Match", RustNode::Match { expr: Box::new(RustNode::ident("x")), arms: vec![] }),
-            ("MethodCall", RustNode::MethodCall { receiver: Box::new(RustNode::ident("s")), method: "len".into(), args: vec![] }),
-            ("FnCall", RustNode::FnCall { name: "f".into(), args: vec![] }),
-            ("MacroCall", RustNode::MacroCall { name: "println".into(), args: vec![] }),
-            ("MacroBlock", RustNode::MacroBlock { name: "proptest".into(), body: "fn t() {}".into() }),
+            (
+                "Use",
+                RustNode::Use {
+                    path: vec!["std".into()],
+                    alias: None,
+                    public: false,
+                },
+            ),
+            (
+                "Mod",
+                RustNode::Mod {
+                    name: "test".into(),
+                    public: true,
+                },
+            ),
+            (
+                "Struct",
+                RustNode::Struct {
+                    name: "S".into(),
+                    public: true,
+                    derives: vec![],
+                    fields: vec![],
+                },
+            ),
+            (
+                "Enum",
+                RustNode::Enum {
+                    name: "E".into(),
+                    public: true,
+                    derives: vec![],
+                    variants: vec![],
+                },
+            ),
+            (
+                "Impl",
+                RustNode::Impl {
+                    target: "S".into(),
+                    trait_name: None,
+                    body: vec![],
+                },
+            ),
+            (
+                "Fn",
+                RustNode::Fn {
+                    name: "f".into(),
+                    public: true,
+                    must_use: false,
+                    args: vec![],
+                    return_type: None,
+                    body: vec![],
+                },
+            ),
+            (
+                "StructInit",
+                RustNode::StructInit {
+                    name: "S".into(),
+                    fields: vec![("x".into(), RustNode::Int(1))],
+                },
+            ),
+            (
+                "Closure",
+                RustNode::Closure {
+                    args: vec!["x".into()],
+                    body: Box::new(RustNode::ident("x")),
+                },
+            ),
+            (
+                "Let",
+                RustNode::Let {
+                    name: "x".into(),
+                    mutable: false,
+                    type_ann: None,
+                    value: Box::new(RustNode::Int(1)),
+                },
+            ),
+            (
+                "Match",
+                RustNode::Match {
+                    expr: Box::new(RustNode::ident("x")),
+                    arms: vec![],
+                },
+            ),
+            (
+                "MethodCall",
+                RustNode::MethodCall {
+                    receiver: Box::new(RustNode::ident("s")),
+                    method: "len".into(),
+                    args: vec![],
+                },
+            ),
+            (
+                "FnCall",
+                RustNode::FnCall {
+                    name: "f".into(),
+                    args: vec![],
+                },
+            ),
+            (
+                "MacroCall",
+                RustNode::MacroCall {
+                    name: "println".into(),
+                    args: vec![],
+                },
+            ),
+            (
+                "MacroBlock",
+                RustNode::MacroBlock {
+                    name: "proptest".into(),
+                    body: "fn t() {}".into(),
+                },
+            ),
             ("Block", RustNode::Block(vec![])),
             ("Return", RustNode::Return(Box::new(RustNode::Int(0)))),
-            ("If", RustNode::If { cond: Box::new(RustNode::Bool(true)), then_body: vec![], else_body: None }),
-            ("For", RustNode::For { binding: "x".into(), iter: Box::new(RustNode::ident("items")), body: vec![] }),
-            ("Attr", RustNode::Attr { path: "test".into(), args: None }),
-            ("InlineMod", RustNode::InlineMod { name: "tests".into(), public: false, body: vec![] }),
+            (
+                "If",
+                RustNode::If {
+                    cond: Box::new(RustNode::Bool(true)),
+                    then_body: vec![],
+                    else_body: None,
+                },
+            ),
+            (
+                "For",
+                RustNode::For {
+                    binding: "x".into(),
+                    iter: Box::new(RustNode::ident("items")),
+                    body: vec![],
+                },
+            ),
+            (
+                "Attr",
+                RustNode::Attr {
+                    path: "test".into(),
+                    args: None,
+                },
+            ),
+            (
+                "InlineMod",
+                RustNode::InlineMod {
+                    name: "tests".into(),
+                    public: false,
+                    body: vec![],
+                },
+            ),
         ];
 
         // Verify we cover all 29 variants
